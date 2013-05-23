@@ -1,6 +1,6 @@
 /*!
- * oauth.js v0.2.0
- * Copyright 2013, Hannes Moser(@twitter)
+ * oauth2.js v0.2.1
+ * Copyright 2013, Hannes Moser (@eliias)
  */
 define(['jquery', 'jstorage', 'underscore', 'backbone'],
 function($, jstorage, _, Backbone) {
@@ -10,7 +10,7 @@ function($, jstorage, _, Backbone) {
      *
      * @type String
      */
-    var STORAGE_KEY = 'opentabs_oauth';
+    var STORAGE_KEY = '__oauth2';
 
     /**
      * The interval between two checks if token expires
@@ -29,15 +29,15 @@ function($, jstorage, _, Backbone) {
     var REFRESH_MAX_TIME = 600;
 
     /**
-     * Backbone.OAuth object
+     * Backbone.OAuth2 object
      *
-     * @type @exp;Backbone@pro;OAuth
+     * @type Backbone.OAuth2
      */
-    var OAuth = Backbone.OAuth = function(options) {
+    var OAuth2 = Backbone.OAuth2 = function(options) {
         options = _.extend({
-            accessUrl:      'https://api.opentabs.de/v2/oauth/access',
-            refreshUrl:     'https://api.opentabs.de/v2/oauth/refresh',
-            revokeUrl:      'https://api.opentabs.de/v2/oauth/revoke',
+            accessUrl:      'https://api.tld/v2/oauth/access',
+            refreshUrl:     'https://api.tld/v2/oauth/refresh',
+            revokeUrl:      'https://api.tld/v2/oauth/revoke',
             autoRefresh:    true
         }, options);
         if (options.accessUrl)      this.accessUrl      = options.accessUrl;
@@ -48,7 +48,7 @@ function($, jstorage, _, Backbone) {
         if (options.clientSecret)   this.clientSecret   = options.clientSecret;
 
         // Store previous authentications
-        Backbone.OAuth.state = load();
+        Backbone.OAuth2.state = load();
 
         /**
          * If autorefresh is enabled, check expiration date of access_token
@@ -57,8 +57,8 @@ function($, jstorage, _, Backbone) {
         if(options.autoRefresh) {
             var self = this;
             var triggerRefresh = function(auth) {
-                if(OAuth.isAuthenticated()) {
-                    if(OAuth.expiresIn() < REFRESH_MAX_TIME) {
+                if(OAuth2.isAuthenticated()) {
+                    if(OAuth2.expiresIn() < REFRESH_MAX_TIME) {
                         console.info('A new access-token/refresh-token has been requested.');
                         auth.refresh();
                     }
@@ -89,18 +89,18 @@ function($, jstorage, _, Backbone) {
      *
      * @type {object}
      */
-    OAuth.state = null;
+    OAuth2.state = null;
 
     /**
      * Verify if the current state is "authenticated".
      *
      * @returns {Boolean}
      */
-    OAuth.isAuthenticated = function() {
+    OAuth2.isAuthenticated = function() {
         // Store previous authentications
-        Backbone.OAuth.state = load();
+        Backbone.OAuth2.state = load();
 
-        var state = OAuth.state;
+        var state = OAuth2.state;
         var time = new Date().getTime();
         if(typeof state !== 'undefined' && state !== null) {
             // Check if token has already expired
@@ -120,19 +120,19 @@ function($, jstorage, _, Backbone) {
      *
      * @returns {int} Seconds until access-token will expire
      */
-    OAuth.expiresIn = function() {
-        if(OAuth.isAuthenticated()) {
+    OAuth2.expiresIn = function() {
+        if(OAuth2.isAuthenticated()) {
             var time = new Date().getTime();
-            var state = OAuth.state;
+            var state = OAuth2.state;
             return (state.time + parseInt(state.expires_in)) - time;
         }
         return -1;
     };
 
     /**
-     * Setup all inheritable <strong>Backbone.OAuth</strong> properties and methods.
+     * Setup all inheritable <strong>Backbone.OAuth2</strong> properties and methods.
      */
-    _.extend(OAuth.prototype, Backbone.Events, {
+    _.extend(OAuth2.prototype, Backbone.Events, {
         /**
          * Initialize is an empty function by default. Override it with your
          * own initialization logic.
@@ -142,7 +142,7 @@ function($, jstorage, _, Backbone) {
         initialize: function() {},
 
         /**
-         * Authenticates against an OAuth endpoint
+         * Authenticates against an OAuth2 endpoint
          *
          * @param {string} username
          * @param {string} password
@@ -153,9 +153,9 @@ function($, jstorage, _, Backbone) {
             var self = this;
 
             // Check if we have already authenticated
-            if(Backbone.OAuth.isAuthenticated()) {
+            if(Backbone.OAuth2.isAuthenticated()) {
                 // Trigger success event
-                self.trigger('success', Backbone.OAuth.state, this);
+                self.trigger('success', Backbone.OAuth2.state, this);
 
                 // Return early
                 return;
@@ -194,8 +194,8 @@ function($, jstorage, _, Backbone) {
                     // Get timediff before and after request for localStorage
                     var timediff = new Date().getTime() - time;
 
-                    // Store response object as Backbone.OAuth property
-                    Backbone.OAuth.state = response;
+                    // Store response object as Backbone.OAuth2 property
+                    Backbone.OAuth2.state = response;
 
                     // Store to localStorage too(faster access)
                     save(response, response.expires_in - timediff);
@@ -231,8 +231,8 @@ function($, jstorage, _, Backbone) {
 
             // Check if we are already authenticated
             if(load()) {
-                // Store response object as Backbone.OAuth property
-                Backbone.OAuth.state = load();
+                // Store response object as Backbone.OAuth2 property
+                Backbone.OAuth2.state = load();
             } else {
                 self.trigger(
                     'error',
@@ -254,7 +254,7 @@ function($, jstorage, _, Backbone) {
                     grant_type:     'refresh_token',
                     client_id:      self.clientId,
                     client_secret:  self.clientSecret,
-                    refresh_token:  OAuth.state.refresh_token
+                    refresh_token:  OAuth2.state.refresh_token
                 },
                 dataType: "json",
 
@@ -272,8 +272,8 @@ function($, jstorage, _, Backbone) {
                     // Get timediff before and after request for localStorage
                     var timediff = new Date().getTime() - time;
 
-                    // Store response object as Backbone.OAuth property
-                    Backbone.OAuth.state = response;
+                    // Store response object as Backbone.OAuth2 property
+                    Backbone.OAuth2.state = response;
 
                     // Store to localStorage too(faster access)
                     save(response, response.expires_in - timediff);
@@ -296,7 +296,7 @@ function($, jstorage, _, Backbone) {
         },
 
         /**
-         * Revoke OAuth access if a valid token exists and clears related
+         * Revoke OAuth2 access if a valid token exists and clears related
          * properties (access_token, refresh_token)
          * @returns {void}
          */
@@ -307,12 +307,12 @@ function($, jstorage, _, Backbone) {
             /*
              * If we are not authenticated, just clear state property
              */
-            if(!OAuth.isAuthenticated()) {
+            if(!OAuth2.isAuthenticated()) {
                 // Clear localStorage (if set)
                 clear();
 
                 // Set state to null
-                OAuth.state = null;
+                OAuth2.state = null;
 
                 // Trigger revoke event
                 self.trigger('revoke', null, this);
@@ -322,7 +322,7 @@ function($, jstorage, _, Backbone) {
             }
 
             // Build header
-            var state = Backbone.OAuth.state;
+            var state = Backbone.OAuth2.state;
             var tokenType = capitalize(state.token_type);
             var accessToken = state.access_token;
 
@@ -331,7 +331,7 @@ function($, jstorage, _, Backbone) {
                 url: self.revokeUrl,
                 type: 'POST',
                 data: {
-                    token:           Backbone.OAuth.state.access_token,
+                    token:           Backbone.OAuth2.state.access_token,
                     token_type_hint: 'access_token'
                 },
                 headers: {
@@ -432,8 +432,8 @@ function($, jstorage, _, Backbone) {
      * @returns {Backbone}
      */
     Backbone.sync = function(method, model, options) {
-        if(Backbone.OAuth.isAuthenticated()) {
-            var state = Backbone.OAuth.state;
+        if(Backbone.OAuth2.isAuthenticated()) {
+            var state = Backbone.OAuth2.state;
             var tokenType = capitalize(state.token_type);
             var accessToken = state.access_token;
             options.headers = options.headers || {};
@@ -446,6 +446,6 @@ function($, jstorage, _, Backbone) {
     /**
      * Setup inheritance
      */
-    OAuth.extend = Backbone.History.extend;
+    OAuth2.extend = Backbone.History.extend;
 
 });
