@@ -215,6 +215,17 @@ define([
         },
 
         /**
+         * Authenticate
+         *
+         * @returns {void}
+         */
+        auth: function () {
+            if (this.isAuthenticated()) {
+                this.trigger('access', this.state, this);
+            }
+        },
+
+        /**
          * Authenticates against an OAuth2 endpoint
          *
          * @param {string} username
@@ -282,6 +293,7 @@ define([
         /**
          * Request a new access_token and request_token by sending a valid
          * refresh_token
+         *
          * @returns {void}
          */
         refresh: function () {
@@ -346,6 +358,7 @@ define([
         /**
          * Revoke OAuth2 access if a valid token exists and clears related
          * properties (access_token, refresh_token)
+         *
          * @returns {void}
          */
         revoke: function () {
@@ -407,6 +420,7 @@ define([
 
     /**
      * Override Backbone.sync for all future requests
+     *
      * @param {string} method
      * @param {Backbone.Model} model
      * @param {object} options
