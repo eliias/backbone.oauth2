@@ -174,7 +174,7 @@ define([
         getAuthorizationHeader: function () {
             if (this.isAuthenticated()) {
                 return {
-                    'authorization': this.getNormalizedTokenType(this.state) + ' ' + this.state.accessToken
+                    'authorization': this.getNormalizedTokenType(this.state.token_type) + ' ' + this.state.access_token
                 };
             }
             throw 'Unauthorized, please use access() to authenticate first';
@@ -221,8 +221,9 @@ define([
          */
         auth: function () {
             if (this.isAuthenticated()) {
-                this.trigger('access', this.state, this);
+                return this.trigger('access', this.state, this);
             }
+            this.trigger('error', this.state, this);
         },
 
         /**
@@ -427,12 +428,6 @@ define([
      * @returns {Backbone}
      */
     Backbone.sync = function (method, model, options) {
-        var auth = new Backbone.Oauth2();
-        if (auth.isAuthenticated()) {
-            options.headers = options.headers || {};
-            _.extend(options.headers, auth.getAuthorizationHeader());
-        }
-
         return sync.call(model, method, model, options);
     };
 
