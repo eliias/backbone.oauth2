@@ -320,7 +320,7 @@ define([
                     grant_type: 'refresh_token',
                     client_id: self.clientId,
                     client_secret: self.clientSecret,
-                    refresh_token: OAuth2.state.refresh_token
+                    refresh_token: self.state.refresh_token
                 },
                 dataType: "json",
 
@@ -411,29 +411,5 @@ define([
             });
         }
     });
-
-    /**
-     * Store the original sync method for later use
-     *
-     * @type Backbone.sync
-     */
-    var sync = Backbone.sync;
-
-    /**
-     * Override Backbone.sync for all future requests
-     *
-     * @param {string} method
-     * @param {Backbone.Model} model
-     * @param {object} options
-     * @returns {Backbone}
-     */
-    Backbone.sync = function (method, model, options) {
-        return sync.call(model, method, model, options);
-    };
-
-    /**
-     * Setup inheritance
-     */
-    OAuth2.extend = Backbone.History.extend;
 
 });
