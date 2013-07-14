@@ -32,6 +32,13 @@ define([
     var REFRESH_MAX_TIME = 600;
 
     /**
+     * The TTL for the localStorage
+     *
+     * @type integer Time in seconds
+     */
+    var STORE_TTL = 2592000;
+
+    /**
      * Backbone.OAuth2 object
      *
      * @type Backbone.OAuth2
@@ -275,7 +282,8 @@ define([
                     var timediff = new Date().getTime() - time;
 
                     // Store to localStorage too(to avoid double authentication calls)
-                    self.save(response, response.expires_in - timediff);
+                    //self.save(response, response.expires_in - timediff);
+                    self.save(response, STORE_TTL);
                     self.trigger('access', response, this);
                 },
 
@@ -340,7 +348,8 @@ define([
                     var timediff = new Date().getTime() - time;
 
                     // Store to localStorage too(faster access)
-                    self.save(response, response.expires_in - timediff);
+                    //self.save(response, response.expires_in - timediff);
+                    self.save(response, STORE_TTL);
                     self.trigger('refresh', response, this);
                 },
 
