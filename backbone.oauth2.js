@@ -34,9 +34,9 @@ define([
     /**
      * The TTL for the localStorage
      *
-     * @type integer Time in seconds
+     * @type integer Time in ms
      */
-    var STORE_TTL = 2592000;
+    var STORE_TTL = 2592000000;
 
     /**
      * Backbone.OAuth2 object
