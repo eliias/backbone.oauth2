@@ -25,11 +25,11 @@ define([
 
     /**
      * The maximum time before an access_token must be renewed
-     * Default value is 600 secs = 10 minutes
+     * Default value is 600000ms = 10 minutes
      *
-     * @type Number Time in seconds
+     * @type Number Time in ms
      */
-    var REFRESH_MAX_TIME = 600;
+    var REFRESH_MAX_TIME = 600000;
 
     /**
      * The TTL for the localStorage
@@ -137,9 +137,10 @@ define([
 
             // Check for expired access_token
             var time = new Date().getTime();
+
             if (typeof this.state !== 'undefined' && this.state !== null) {
                 // Check if token has already expired
-                if (parseInt(this.state.expires_in) + this.state.time > time) {
+                if (this.state.expires_in + this.state.time > time) {
                     return true;
                 }
             }
@@ -157,7 +158,7 @@ define([
         expiresIn: function () {
             if (this.isAuthenticated()) {
                 var time = new Date().getTime();
-                return (this.state.time + parseInt(this.state.expires_in)) - time;
+                return (this.state.time + this.state.expires_in) - time;
             }
             return 0;
         },
@@ -193,7 +194,9 @@ define([
          * @returns {object,boolean}
          */
         load: function () {
+            // Load
             this.state = $.jStorage.get(STORAGE_KEY, false);
+
             return this.state;
         },
 
@@ -204,6 +207,7 @@ define([
          * @returns {void}
          */
         save: function (state, ttl) {
+            // Save
             this.state = state;
             $.jStorage.set(STORAGE_KEY, state);
             $.jStorage.setTTL(STORAGE_KEY, ttl);
@@ -279,7 +283,9 @@ define([
                      * Extend response object with current time
                      */
                     response.time = time;
-                    var timediff = new Date().getTime() - time;
+
+                    // Cast expires_in to Int and multiply by 1000 to get ms
+                    response.expires_in = parseInt(response.expires_in) * 1000;
 
                     // Store to localStorage too(to avoid double authentication calls)
                     //self.save(response, response.expires_in - timediff);
@@ -345,7 +351,9 @@ define([
                      * Get timediff before and after request for localStorage
                      */
                     response.time = time;
-                    var timediff = new Date().getTime() - time;
+
+                    // Cast expires_in to Int and multiply by 1000 to get ms
+                    response.expires_in = parseInt(response.expires_in) * 1000;
 
                     // Store to localStorage too(faster access)
                     //self.save(response, response.expires_in - timediff);
