@@ -398,6 +398,7 @@ define([
             $.ajax({
                 url: self.revokeUrl,
                 type: 'POST',
+                dataType: 'text', // Force text, maybe someone tries to be cool and set application/json with no content
                 data: {
                     token: accessToken,
                     token_type_hint: 'access_token'
