@@ -43,7 +43,8 @@ define([
      *
      * @type Backbone.OAuth2
      */
-    var OAuth2 = Backbone.OAuth2 = function (options) {
+    var OAuth2 = Backbone.OAuth2 = function(opts) {
+
         /**
          * Extend defaults with options
          * @type {*|void}
@@ -53,7 +54,7 @@ define([
             refreshUrl  : 'https://api.tld/v2/oauth/refresh',
             revokeUrl   : 'https://api.tld/v2/oauth/revoke',
             autoRefresh : true
-        }, options);
+        }, opts);
         if (options.accessUrl)      this.accessUrl = options.accessUrl;
         if (options.refreshUrl)     this.refreshUrl = options.refreshUrl;
         if (options.revokeUrl)      this.revokeUrl = options.revokeUrl;
@@ -125,7 +126,6 @@ define([
          */
         initialize: function () {
         },
-
 
         /**
          * Verify if the current state is "authenticated".
@@ -264,11 +264,11 @@ define([
                 url: self.accessUrl,
                 type: 'POST',
                 data: {
-                    grant_type: 'password',
-                    client_id: self.clientId,
-                    client_secret: self.clientSecret,
-                    username: username,
-                    password: password
+                    grant_type      : 'password',
+                    client_id       : self.clientId,
+                    client_secret   : self.clientSecret,
+                    username        : username,
+                    password        : password
                 },
                 dataType: 'json',
 
@@ -333,10 +333,10 @@ define([
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                    grant_type: 'refresh_token',
-                    client_id: self.clientId,
-                    client_secret: self.clientSecret,
-                    refresh_token: self.state.refresh_token
+                    grant_type      : 'refresh_token',
+                    client_id       : self.clientId,
+                    client_secret   : self.clientSecret,
+                    refresh_token   : self.state.refresh_token
                 },
                 headers: this.getAuthorizationHeader(),
 
@@ -402,8 +402,8 @@ define([
                 type: 'POST',
                 dataType: 'text', // Force text, maybe someone tries to be cool and set application/json with no content
                 data: {
-                    token: accessToken,
-                    token_type_hint: 'access_token'
+                    token           : accessToken,
+                    token_type_hint : 'access_token'
                 },
                 headers: this.getAuthorizationHeader(),
 
