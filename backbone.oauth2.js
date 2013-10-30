@@ -49,10 +49,10 @@ define([
          * @type {*|void}
          */
         options = _.extend({
-            accessUrl: 'https://api.tld/v2/oauth/access',
-            refreshUrl: 'https://api.tld/v2/oauth/refresh',
-            revokeUrl: 'https://api.tld/v2/oauth/revoke',
-            autoRefresh: true
+            accessUrl   : 'https://api.tld/v2/oauth/access',
+            refreshUrl  : 'https://api.tld/v2/oauth/refresh',
+            revokeUrl   : 'https://api.tld/v2/oauth/revoke',
+            autoRefresh : true
         }, options);
         if (options.accessUrl)      this.accessUrl = options.accessUrl;
         if (options.refreshUrl)     this.refreshUrl = options.refreshUrl;
@@ -94,7 +94,7 @@ define([
          */
         if (options.autoRefresh) {
             var self = this;
-            var triggerRefresh = function (auth) {
+            var triggerRefresh = function myself (auth) {
                 if (self.isAuthenticated()) {
                     if (self.expiresIn() < REFRESH_MAX_TIME) {
                         console.info('A new access-token/refresh-token has been requested.');
@@ -102,6 +102,7 @@ define([
                     }
                     setTimeout(triggerRefresh, AUTO_REFRESH_TIME, auth);
                 }
+                setTimeout(myself, AUTO_REFRESH_TIME, auth);
             };
             setTimeout(triggerRefresh, AUTO_REFRESH_TIME, self);
         }
@@ -269,7 +270,7 @@ define([
                     username: username,
                     password: password
                 },
-                dataType: "json",
+                dataType: 'json',
 
                 /**
                  * Success event, triggered on every successfull
@@ -330,13 +331,14 @@ define([
             $.ajax({
                 url: self.refreshUrl,
                 type: 'POST',
+                dataType: 'json',
                 data: {
                     grant_type: 'refresh_token',
                     client_id: self.clientId,
                     client_secret: self.clientSecret,
                     refresh_token: self.state.refresh_token
                 },
-                dataType: "json",
+                headers: this.getAuthorizationHeader(),
 
                 /**
                  * Success event, triggered on every successfull
