@@ -1,5 +1,5 @@
 /*!
- * oauth2.js v0.2.1
+ * oauth2.js v0.2.2
  * Copyright 2013, Hannes Moser (@eliias)
  */
 define([
@@ -21,7 +21,7 @@ define([
      *
      * @type Number Time in ms
      */
-    var AUTO_REFRESH_TIME = 60000;
+    var AUTO_REFRESH_TIME = 5000;
 
     /**
      * The maximum time before an access_token must be renewed
