@@ -21,7 +21,7 @@ define([
      *
      * @type Number Time in ms
      */
-    var AUTO_REFRESH_TIME = 5000;
+    var AUTO_REFRESH_TIME = 60000;
 
     /**
      * The maximum time before an access_token must be renewed
@@ -103,7 +103,6 @@ define([
                     }
                     setTimeout(triggerRefresh, AUTO_REFRESH_TIME, auth);
                 }
-                setTimeout(myself, AUTO_REFRESH_TIME, auth);
             };
             setTimeout(triggerRefresh, AUTO_REFRESH_TIME, self);
         }
