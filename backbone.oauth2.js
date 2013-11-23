@@ -220,7 +220,7 @@ define([
          */
         load: function () {
             // Load
-            this.state = storage.getItem(STORAGE_KEY);
+            this.state = JSON.parse(storage.getItem(STORAGE_KEY));
 
             return this.state;
         },
@@ -234,7 +234,7 @@ define([
         save: function (state) {
             // Save
             this.state = state;
-            storage.setItem(STORAGE_KEY, state);
+            storage.setItem(STORAGE_KEY, JSON.stringify(state));
         },
 
         /**
