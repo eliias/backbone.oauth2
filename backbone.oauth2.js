@@ -5,8 +5,8 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
-    'jstorage'], function ($, _, Backbone) {
+    'backbone'
+], function ($, _, Backbone) {
 
     /**
      * The key used for localStorage
@@ -32,11 +32,20 @@ define([
     var REFRESH_MAX_TIME = 600000;
 
     /**
-     * The TTL for the localStorage
-     *
-     * @type integer Time in ms
+     * @type Storage
      */
-    var STORE_TTL = 2592000000;
+    var storage;
+
+    /**
+     * Has client localStorage support
+     */
+    var hasLocalStorageSupport = function() {
+        try {
+            storage = 'localStorage' in window && window['localStorage'] !== null;
+        } catch (e) {
+            return false;
+        }
+    };
 
     /**
      * Backbone.OAuth2 object
@@ -61,6 +70,22 @@ define([
         if (options.grantType)      this.grantType = options.grantType;
         if (options.clientId)       this.clientId = options.clientId;
         if (options.clientSecret)   this.clientSecret = options.clientSecret;
+
+        /**
+         * Create localStorage
+         */
+        if ( hasLocalStorageSupport() ) {
+            storage = window.localStorage;
+        } else {
+            storage = {
+                setItem: function() {
+                    console.warning('backbone.oauth2: Localstorage not available: save failed');
+                },
+                removeItem: function() {
+                    console.warning('backbone.oauth2: Localstorage not available: removal failed');
+                }
+            }
+        }
 
         /**
          * Set current state object to null. This object is later used to
@@ -195,13 +220,13 @@ define([
          */
         load: function () {
             // Load
-            this.state = $.jStorage.get(STORAGE_KEY, false);
+            this.state = storage.getItem(STORAGE_KEY);
 
             return this.state;
         },
 
         /**
-         * Save state with STORAGE_KEY to localStorage and set ttl
+         * Save state with STORAGE_KEY to localStorage
          *
          * @param {object} state
          * @returns {void}
@@ -209,8 +234,7 @@ define([
         save: function (state, ttl) {
             // Save
             this.state = state;
-            $.jStorage.set(STORAGE_KEY, state);
-            $.jStorage.setTTL(STORAGE_KEY, ttl);
+            storage.setItem(STORAGE_KEY, state);
         },
 
         /**
@@ -220,8 +244,8 @@ define([
          */
         clear: function () {
             this.state = null;
-            if ($.jStorage.get(STORAGE_KEY, false)) {
-                $.jStorage.deleteKey(STORAGE_KEY);
+            if (storage.getItem(STORAGE_KEY)) {
+                storage.removeKey(STORAGE_KEY);
             }
         },
 
@@ -421,7 +445,9 @@ define([
                 /**
                  * Error event, triggered on every failed authentication attempt.
                  *
-                 * @param {object} response
+                 * @param {object} xhr
+                 * @param {object} ajaxOptions
+                 * @param {object} thrownError
                  * @returns {void}
                  */
                 error: function (xhr, ajaxOptions, thrownError) {
