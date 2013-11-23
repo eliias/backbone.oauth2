@@ -41,7 +41,7 @@ define([
      */
     var hasLocalStorageSupport = function() {
         try {
-            storage = 'localStorage' in window && window['localStorage'] !== null;
+            return 'localStorage' in window && window['localStorage'] !== null;
         } catch (e) {
             return false;
         }
