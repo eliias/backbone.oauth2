@@ -313,7 +313,7 @@ define([
 
                     // Store to localStorage too(to avoid double authentication calls)
                     //self.save(response, response.expires_in - timediff);
-                    self.save(response, STORE_TTL);
+                    self.save(response);
                     self.trigger('access', response, this);
                 },
 
@@ -382,7 +382,7 @@ define([
 
                     // Store to localStorage too(faster access)
                     //self.save(response, response.expires_in - timediff);
-                    self.save(response, STORE_TTL);
+                    self.save(response);
                     self.trigger('refresh', response, this);
                 },
 
