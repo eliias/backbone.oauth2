@@ -245,7 +245,7 @@ define([
         clear: function () {
             this.state = null;
             if (storage.getItem(STORAGE_KEY)) {
-                storage.removeKey(STORAGE_KEY);
+                storage.removeItem(STORAGE_KEY);
             }
         },
 
