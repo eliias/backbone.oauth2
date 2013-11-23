@@ -231,7 +231,7 @@ define([
          * @param {object} state
          * @returns {void}
          */
-        save: function (state, ttl) {
+        save: function (state) {
             // Save
             this.state = state;
             storage.setItem(STORAGE_KEY, state);
